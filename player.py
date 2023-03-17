@@ -126,13 +126,16 @@ def showplaybar(file):
             playstatus ='PLAY'               
             time.sleep(0.2)                      
         if laststep != int(i/playtime*100):
-            laststep = int(i/playtime*100)
+            laststep = int(i/playtime*100)            
             print("\r", end="")
-            print("进度: {}%: ".format(laststep), "▓" * (int(laststep)), end="")
+            print("进度: {}%: ".format(laststep), "▓" * (int(laststep)//2), end="")
             sys.stdout.flush()
         i = i+1
         time.sleep(1)
-
+    #由于上面是2%一个柱，到了100%补上最后的进度条。
+    print("\r", end="")
+    print("进度: 100%: ", "▓" * 50, end="")
+    sys.stdout.flush()
     print("\n\n")
 
 def play(file, format, channels, rate):
@@ -204,20 +207,21 @@ def on_activate_p():
         clearKeyhit()
         playstatus ='PLAY'
         print("\r", end="")             
-        print("               ", end="")
+        print("                                                                                                                        ", end="")
         sys.stdout.flush()
         return         
     elif playstatus =='PLAY':
         clearKeyhit()
         playstatus ='PAUSE'        
         print("\r", end="")             
-        print("  --- pause ---", end="")        
+        print("  --- pause ---                                                                                                         ", end="")        
         sys.stdout.flush()
         return         
         
 
 def on_activate_s():
     global playstatus
+    time.sleep(0.1)
     clearKeyhit()
     print("\n\nstop")
     playstatus ='STOP'
@@ -255,7 +259,7 @@ def on_activate_j():
     #print("\n\nprev")
     playstatus ='FORWARD'
     print("\r", end="")             
-    print("                                                                                                   ", end="")        
+    print("                                                                                                                              ", end="")        
     sys.stdout.flush()
     return         
 
@@ -265,7 +269,7 @@ def on_activate_h():
     #print("\n\nprev")
     playstatus ='BACK'
     print("\r", end="")             
-    print("                                                                                                   ", end="")        
+    print("                                                                                                                             ", end="")        
     sys.stdout.flush()
     return         
 

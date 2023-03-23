@@ -138,14 +138,16 @@ def showplaybar(file):
     sys.stdout.flush()
     print("\n\n")
 
-def play(file, format, channels, rate):
+def play(file):
     global playstatus
     global music_length
     """
     重要的函数，音频的播放基本都在这个函数中进行处理
     """
+    
     p = pyaudio.PyAudio()
     song = AudioSegment.from_file(file)
+    
     
     """
     设置音频的参数：
@@ -153,12 +155,28 @@ def play(file, format, channels, rate):
     channels（音频声道的数量，注意：此处一定要注意使用上面的函数打印的音频采样大小为24时，则将channels设置为2，如果音频采样大小为16，则将channels值设置为1，反正只能比最大声道数小，不能大，还有采样大小为16时设置为2，则没有声音【这让我一度怀疑，是不是下载了假的FLAC文件】，24设置为1时，只能听到部分，有兴趣的大家可以自己试试），
     rate（设置音频采样率，照着上方函数获取的值填写就好了，当然采样率不同设置错了，也会导致播放出来的音频中的音调、节奏等都会发生改变，调试的时候我就出现过将女声变成男声，整个节奏慢半拍等状况，但有些歌将采样率调大了以后，反而是别有一番韵味，比如将：起风了【旧版】的采样率调制为48000）
     """
-    
+    #发现播放立体声出来的没有双声道，修改播放的参数试一下。
+    #这是原资料中播放flac的，暂时不调整    
+    format  =2
+    channels = 1
+    rate = 44100
+    #参考另一个资料中关于播放WAV的设置
+    if file[-3:].lower() in ['wav']:
+        wavefile = wave.open(file, 'rb')    
+        format=p.get_format_from_width(wavefile.getsampwidth())
+        channels=wavefile.getnchannels()
+        rate=wavefile.getframerate()
+        wavefile.close()
+                
+        #data = wavefile.readframes(CHUNK)
+        #while data != b"":
+        #    stream.write(data)
+        #    data = wavefile.readframes(CHUNK)
+
     stream = p.open(format=format,
-                     channels=channels,
-                     rate=rate,
-                     output=True)
- 
+                    channels=channels,
+                    rate=rate,
+                    output=True)
     #显示进度条
     showbar = Thread(target =showplaybar,args=(file,)) 
     showbar.start()        
@@ -186,6 +204,10 @@ def play(file, format, channels, rate):
             if index <0 :
                 index =0
             time.sleep(0.2)
+
+
+
+    
             
             
     # 停止数据流
@@ -290,7 +312,7 @@ def StartPlay():
             i =0
             while  i  <len(music_list):
                 print("开始播放：%s"%(music_list[i]))                        
-                play(music_list[i], 2, 1, 44100)            
+                play(music_list[i])            
                 i=i+1
                 if playstatus == 'STOP':
                     playstatus ='PLAY'
